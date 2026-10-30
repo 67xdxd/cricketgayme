@@ -19,7 +19,7 @@
 <div id="speedbox"><div id="speed">0<small>KM/H</small></div></div>
 <button id="switch">CHANGE CAR</button>
 <div id="controls"><div class="cluster" id="steer"><button class="steer" id="left">◀</button><button class="steer" id="right">▶</button></div><div class="cluster"><button class="pedal brake" id="brake">BRAKE<br>REV</button><button class="pedal gas" id="gas">ACCEL</button></div></div>
-<div id="menu"><div id="panel"><h1>OPEN ROAD</h1><div id="subtitle">Pick a car. Find your road. Drive at your own pace.</div><div class="section">SELECT YOUR CAR</div><div class="cars" id="cars"></div><div class="section">DRIVE MODE</div><div class="row"><button class="mode active" id="day">☀ DAY</button><button class="mode" id="sunset">🌇 SUNSET</button><button class="mode" id="night">🌙 NIGHT</button></div><button id="start">START FREE DRIVE</button><div id="note">Mobile: ◀ ▶ to steer · ACCEL to drive · BRAKE/REV to slow down or reverse. No timer, no opponents, no racing. Game uses a lightweight 3D browser engine and needs internet to load it.</div></div></div>
+<div id="menu"><div id="panel"><h1>OPEN ROAD</h1><div id="subtitle">Pick a car. Find your road. Drive at your own pace.</div><div class="section">SELECT YOUR CAR</div><div class="cars" id="cars"></div><div class="section">DRIVE MODE</div><div class="row"><button class="mode active" id="day">☀ DAY</button><button class="mode" id="sunset">🌇 SUNSET</button><button class="mode" id="night">🌙 NIGHT</button></div><button id="start">START FREE DRIVE</button><div id="note">Mobile: ◀ ▶ to steer · ACCEL to drive · BRAKE/REV to slow down or reverse. No timer, no opponents, no racing. Improved 3D free-drive prototype; internet is needed to load the graphics engine.</div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js"></script>
 <script>
 (()=>{
@@ -38,15 +38,30 @@ renderCars();
 $('day').onclick=()=>setMode('day');$('sunset').onclick=()=>setMode('sunset');$('night').onclick=()=>setMode('night');
 function setMode(m){mode=m;['day','sunset','night'].forEach(x=>$(x).classList.toggle('active',x===m))}
 const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,500);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;$('world').appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;$('world').appendChild(renderer.domElement);
 scene.fog=new THREE.Fog(0x9bcde4,90,260);const hemi=new THREE.HemisphereLight(0xd9efff,0x56634e,2);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(-40,80,30);sun.castShadow=true;scene.add(sun);
 function setLighting(){let bg=mode==='night'?0x08152c:mode==='sunset'?0xf0a078:0x9bcde4;scene.background=new THREE.Color(bg);scene.fog.color.setHex(bg);sun.intensity=mode==='night'?.35:mode==='sunset'?1.1:2;hemi.intensity=mode==='night'?.55:1.8}
 const mat=(c,r=.75)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
 const obstacles=[];
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),mat(0x528454));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);
 // Broad road loop, plus side streets
-const roadMat=mat(0x303944),lineMat=mat(0xf4e8ad),white=mat(0xffffff);
-function road(x,z,w,d){let m=new THREE.Mesh(new THREE.BoxGeometry(w,.08,d),roadMat);m.position.set(x,-.04,z);m.receiveShadow=true;scene.add(m);for(let k=-Math.floor(d/12);k<=Math.floor(d/12);k++){let dash=new THREE.Mesh(new THREE.BoxGeometry(.18,.02,4),lineMat);dash.position.set(x,-.0,z+k*12);scene.add(dash)}}
+const roadMat=new THREE.MeshStandardMaterial({color:0x252b32,roughness:.96}),lineMat=mat(0xf4e8ad),white=mat(0xe8edf0),sidewalkMat=mat(0x92999d);
+function road(x,z,w,d){
+  const asphalt=new THREE.Mesh(new THREE.BoxGeometry(w,.12,d),roadMat);asphalt.position.set(x,-.055,z);asphalt.receiveShadow=true;scene.add(asphalt);
+  const vertical=d>=w,long=vertical?d:w,cross=vertical?w:d;
+  for(const side of [-1,1]){
+    const edge=new THREE.Mesh(new THREE.BoxGeometry(vertical?.13:long,.025,vertical?long:.13),white);
+    edge.position.set(x+(vertical?side*(cross/2-1):0),.015,z+(vertical?0:side*(cross/2-1)));scene.add(edge);
+  }
+  for(let k=-Math.floor(long/12);k<=Math.floor(long/12);k++){
+    const dash=new THREE.Mesh(new THREE.BoxGeometry(vertical?.16:4,.025,vertical?4:.16),lineMat);
+    dash.position.set(x+(vertical?0:k*12),.018,z+(vertical?k*12:0));scene.add(dash);
+  }
+  for(const side of [-1,1]){
+    const sw=new THREE.Mesh(new THREE.BoxGeometry(vertical?1.5:long,.22,vertical?long:1.5),sidewalkMat);
+    sw.position.set(x+(vertical?side*(cross/2+0.85):0),.015,z+(vertical?0:side*(cross/2+0.85)));sw.receiveShadow=true;scene.add(sw);
+  }
+}
 road(0,0,18,360);road(0,-110,210,16);road(0,110,210,16);road(-95,0,16,220);road(95,0,16,220);road(0,0,210,16);
 // City blocks, trees and streetlights
 for(let x=-250;x<=250;x+=30)for(let z=-270;z<=270;z+=32){if(Math.abs(x)<19||Math.abs(z)<19||Math.abs(Math.abs(x)-95)<12||Math.abs(Math.abs(z)-110)<12)continue;
@@ -54,6 +69,18 @@ let h=7+Math.random()*30,w=11+Math.random()*10,d=11+Math.random()*10;obstacles.p
 for(let yy=2;yy<h-1;yy+=3)for(let xx=-w/2+2;xx<w/2;xx+=3){let win=new THREE.Mesh(new THREE.BoxGeometry(.8,.9,.05),new THREE.MeshBasicMaterial({color:mode==='night'?0xffd77a:0x9bdcf2}));win.position.set(x+xx,yy,z-d/2-.03);scene.add(win)}
 }
 for(let i=0;i<150;i++){let x=(Math.random()-.5)*520,z=(Math.random()-.5)*540;if(Math.abs(x)<16||Math.abs(z)<16||Math.abs(Math.abs(x)-95)<12||Math.abs(Math.abs(z)-110)<12)continue;let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,2,7),mat(0x705039));trunk.position.set(x,1,z);scene.add(trunk);let crown=new THREE.Mesh(new THREE.SphereGeometry(1.5,8,7),mat(0x267347));crown.position.set(x,2.8,z);crown.scale.y=1.25;scene.add(crown)}
+// street lamps along the main avenues
+const lampMat=mat(0x303a43),bulbMat=new THREE.MeshBasicMaterial({color:0xffefc2});
+for(let z=-165;z<=165;z+=30)for(const x of [-12,12]){
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,6,8),lampMat);pole.position.set(x,3,z);scene.add(pole);
+  const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.09,.09),lampMat);arm.position.set(x+(x<0?.38:-.38),5.85,z);scene.add(arm);
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(.18,8,8),bulbMat);bulb.position.set(x+(x<0?.78:-.78),5.72,z);scene.add(bulb);
+}
+// simple roadside parking bays and crosswalks at the central junction
+for(let i=-4;i<=4;i++){
+  const stripe=new THREE.Mesh(new THREE.BoxGeometry(.7,.025,5),white);stripe.position.set(i*1.25,.025,-9);scene.add(stripe);
+  const stripe2=stripe.clone();stripe2.position.z=9;scene.add(stripe2);
+}
 // car builder: body proportions and visible details
 let carGroup=new THREE.Group(),wheelMeshes=[],wheelRadius=.43;
 function buildCar(){scene.remove(carGroup);carGroup=new THREE.Group();wheelMeshes=[];let c=cars[selected],paint=mat(c.color,.3),dark=mat(0x17212b,.35),glass= new THREE.MeshStandardMaterial({color:0x83c9e6,metalness:.25,roughness:.18});
@@ -61,8 +88,22 @@ function box(w,h,d,m,x,y,z){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m)
 box(2.05,.58,4.15,paint,0,.8,0);box(1.72,.65,2.05,paint,0,1.35,-.35);box(1.62,.48,1.75,glass,0,1.42,-.38);
 box(1.88,.13,.1,mat(0xffffff),0,.87,-2.08);box(1.85,.14,.1,mat(0xff382e),0,.87,2.08);
 for(let x of [-1,1])for(let z of [-1.35,1.35]){let wheel=new THREE.Mesh(new THREE.CylinderGeometry(wheelRadius,wheelRadius,.28,18),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(x*1.03,.43,z);wheel.castShadow=true;carGroup.add(wheel);wheelMeshes.push(wheel);let hub=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.3,16),mat(0xbac5cc,.25));hub.rotation.z=Math.PI/2;hub.position.copy(wheel.position);carGroup.add(hub)}
-// mirrors
-for(let x of [-1,1])box(.18,.18,.3,dark,x*1.05,1.25,-.85);
+// mirrors, bumpers, grille, lights, window pillars and sporty details
+for(let x of [-1,1])box(.2,.16,.32,dark,x*1.08,1.25,-.86);
+box(1.72,.16,.16,dark,0,.58,-2.12); // front grille
+box(1.82,.12,.16,dark,0,.55,2.12); // rear diffuser
+for(let x of [-.72,.72]){
+  box(.42,.13,.12,mat(0xfff3cf,.25),x,.91,-2.13); // headlights
+  box(.38,.13,.12,mat(0xff2525,.25),x,.91,2.13); // tail lamps
+  // visible side windows
+  box(.045,.43,1.28,dark,x*1.01,1.48,-.42);
+  // wheel arch trim
+  const arch=new THREE.Mesh(new THREE.TorusGeometry(.49,.065,8,24),dark);arch.rotation.y=Math.PI/2;arch.position.set(x*1.02,.48,-1.35);carGroup.add(arch);
+  const arch2=arch.clone();arch2.position.z=1.35;carGroup.add(arch2);
+}
+// hood crease lines and roof spoiler
+for(let x of [-.62,.62])box(.035,.018,1.15,mat(0xffffff,.45),x,1.105,-1.35);
+box(1.55,.08,.22,dark,0,1.78,.78);
 scene.add(carGroup);carGroup.position.set(0,0,0)}
 buildCar();
 // clouds, sun/moon
