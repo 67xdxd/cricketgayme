@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>OPEN ROAD — Free Drive</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#86b9d8;font-family:system-ui,Arial;color:#fff;touch-action:none}#world{position:fixed;inset:0}canvas{display:block}
+#top{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;gap:8px}.glass{transition:transform .2s,border-color .2s;animation:floatui 4s ease-in-out infinite}.glass:nth-child(2){animation-delay:1s}@keyframes floatui{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}.glass{background:#071321dc;border:1px solid #bdeaff55;border-radius:13px;padding:9px 12px;backdrop-filter:blur(8px);box-shadow:0 4px 18px #0005}.brand{font-weight:1000;letter-spacing:2px;color:#9be9ff}.small{font-size:10px;color:#c5d6e5}.right{text-align:right;font-size:12px;line-height:1.5}
+#speedbox{position:fixed;right:14px;bottom:118px;width:116px;height:116px;border-radius:50%;background:#061321e8;border:3px solid #a8eaff88;display:grid;place-items:center;box-shadow:0 5px 20px #0008;pointer-events:none}#speed{text-align:center;font-size:34px;font-weight:1000;line-height:1;color:#fff}#speed small{display:block;font-size:10px;letter-spacing:2px;color:#9fdfff;margin-top:5px}
+#controls{position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:space-between;align-items:end;padding:0 15px;pointer-events:none;gap:12px}.cluster{display:flex;gap:10px;align-items:end;pointer-events:auto}.pedal{width:72px;height:76px;border-radius:17px;border:1px solid #ffffff88;background:linear-gradient(#263e59ee,#081321ee);color:white;font-weight:1000;font-size:12px;box-shadow:0 5px 12px #0007;touch-action:none}.pedal.gas{background:linear-gradient(#41c98b,#08714d)}.pedal.brake{background:linear-gradient(#fa806e,#9b2929)}.pedal:active{filter:brightness(1.25);transform:translateY(2px)}#steer{display:flex;gap:8px;pointer-events:auto}.steer{width:58px;height:62px;border-radius:15px;border:1px solid #ffffff88;background:#081321df;color:white;font-size:26px;font-weight:900;touch-action:none}
+#menu{position:fixed;inset:0;z-index:5;background:linear-gradient(130deg,#071625ed,#102e43eF);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}#panel{animation:panelin .45s cubic-bezier(.2,.8,.2,1);width:min(560px,100%);background:#081727f5;border:1px solid #8edfff66;border-radius:22px;padding:20px;box-shadow:0 18px 55px #0009}@keyframes panelin{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}h1{margin:0;color:#9be9ff;font-size:clamp(30px,8vw,46px);letter-spacing:3px}#subtitle{color:#c5d9e8;margin:5px 0 16px;font-size:13px}.section{font-size:11px;letter-spacing:2px;color:#8bdfff;font-weight:900;margin:14px 0 8px}.cars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.car{transition:transform .16s,background .16s,border-color .16s}.car:active{transform:scale(.97)}.car{border:1px solid #52728b;background:#10253a;border-radius:12px;padding:10px;text-align:left;color:white;min-height:65px}.car.selected{border:2px solid #70e4ff;background:#153d56}.car b{display:block;font-size:13px}.car span{font-size:11px;color:#bad1e2}.row{display:flex;gap:8px;flex-wrap:wrap}.mode{background:#152b40;border:1px solid #54718a;color:#fff;border-radius:10px;padding:9px 12px;font-weight:800}.mode.active{border-color:#8beaff;background:#16445b}#start{width:100%;padding:15px;border:0;border-radius:12px;background:linear-gradient(90deg,#20c9e9,#4d78ff);color:white;font-weight:1000;font-size:16px;letter-spacing:2px;margin-top:16px}#note{font-size:10px;color:#9db7c9;margin-top:10px;line-height:1.4}
+#switch{position:fixed;left:50%;transform:translateX(-50%);bottom:103px;border:1px solid #bdeaff77;border-radius:10px;background:#071321dc;color:white;padding:8px 12px;font-size:11px;font-weight:900;pointer-events:auto}
+@media(min-width:800px){.pedal{width:86px;height:84px}.steer{width:68px;height:68px}#speedbox{right:28px;bottom:130px}}
+</style></head>
+<body>
+<div id="world"></div>
+<div id="top"><div class="glass"><div class="brand">OPEN ROAD</div><div class="small">FREE DRIVE • NO RACES</div></div><div class="glass right"><span id="carname">Starter Coupe</span><br><span id="gear">D</span> • <span id="status">READY</span></div></div>
+<div id="speedbox"><div id="speed">0<small>KM/H</small></div></div>
+<button id="switch">CHANGE CAR</button>
+<div id="controls"><div class="cluster" id="steer"><button class="steer" id="left">◀</button><button class="steer" id="right">▶</button></div><div class="cluster"><button class="pedal brake" id="brake">BRAKE<br>REV</button><button class="pedal gas" id="gas">ACCEL</button></div></div>
+<div id="menu"><div id="panel"><h1>OPEN ROAD</h1><div id="subtitle">Pick a car. Find your road. Drive at your own pace.</div><div class="section">SELECT YOUR CAR</div><div class="cars" id="cars"></div><div class="section">DRIVE MODE</div><div class="row"><button class="mode active" id="day">☀ DAY</button><button class="mode" id="sunset">🌇 SUNSET</button><button class="mode" id="night">🌙 NIGHT</button></div><button id="start">START FREE DRIVE</button><div id="note">Mobile: ◀ ▶ to steer · ACCEL to drive · BRAKE/REV to slow down or reverse. No timer, no opponents, no racing. Game uses a lightweight 3D browser engine and needs internet to load it.</div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js"></script>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+if(!window.THREE){$('subtitle').textContent='3D engine failed to load. Check your internet connection and refresh.';return}
+const cars=[
+{name:'City Hatch',type:'HATCHBACK',max:105,acc:16,color:0xe8e9ed,price:'FREE'},
+{name:'Street Coupe',type:'COUPE',max:155,acc:19,color:0x2585df,price:'FREE'},
+{name:'Sport Sedan',type:'SPORT',max:190,acc:22,color:0xe34c48,price:'FREE'},
+{name:'Rally 4x4',type:'SUV',max:165,acc:17,color:0xe3b43e,price:'FREE'},
+{name:'Super GT',type:'SUPERCAR',max:285,acc:28,color:0x25b987,price:'FREE'},
+{name:'Hypercar X',type:'HYPERCAR',max:350,acc:32,color:0x9d65ed,price:'FREE'}
+];let selected=0,mode='day',started=false,speed=0,steer=0,gas=0,brake=0,heading=0;
+function renderCars(){ $('cars').innerHTML='';cars.forEach((c,i)=>{let b=document.createElement('button');b.className='car'+(i===selected?' selected':'');b.innerHTML=`<b>${c.name}</b><span>${c.type} • ${c.max} km/h • ${c.price}</span>`;b.onclick=()=>{selected=i;renderCars()};$('cars').appendChild(b)})}
+renderCars();
+$('day').onclick=()=>setMode('day');$('sunset').onclick=()=>setMode('sunset');$('night').onclick=()=>setMode('night');
+function setMode(m){mode=m;['day','sunset','night'].forEach(x=>$(x).classList.toggle('active',x===m))}
+const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,500);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;$('world').appendChild(renderer.domElement);
+scene.fog=new THREE.Fog(0x9bcde4,90,260);const hemi=new THREE.HemisphereLight(0xd9efff,0x56634e,2);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(-40,80,30);sun.castShadow=true;scene.add(sun);
+function setLighting(){let bg=mode==='night'?0x08152c:mode==='sunset'?0xf0a078:0x9bcde4;scene.background=new THREE.Color(bg);scene.fog.color.setHex(bg);sun.intensity=mode==='night'?.35:mode==='sunset'?1.1:2;hemi.intensity=mode==='night'?.55:1.8}
+const mat=(c,r=.75)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
+const obstacles=[];
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),mat(0x528454));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);
+// Broad road loop, plus side streets
+const roadMat=mat(0x303944),lineMat=mat(0xf4e8ad),white=mat(0xffffff);
+function road(x,z,w,d){let m=new THREE.Mesh(new THREE.BoxGeometry(w,.08,d),roadMat);m.position.set(x,-.04,z);m.receiveShadow=true;scene.add(m);for(let k=-Math.floor(d/12);k<=Math.floor(d/12);k++){let dash=new THREE.Mesh(new THREE.BoxGeometry(.18,.02,4),lineMat);dash.position.set(x,-.0,z+k*12);scene.add(dash)}}
+road(0,0,18,360);road(0,-110,210,16);road(0,110,210,16);road(-95,0,16,220);road(95,0,16,220);road(0,0,210,16);
+// City blocks, trees and streetlights
+for(let x=-250;x<=250;x+=30)for(let z=-270;z<=270;z+=32){if(Math.abs(x)<19||Math.abs(z)<19||Math.abs(Math.abs(x)-95)<12||Math.abs(Math.abs(z)-110)<12)continue;
+let h=7+Math.random()*30,w=11+Math.random()*10,d=11+Math.random()*10;obstacles.push({x,z,w,d});let b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat([0x8799a8,0xb0a59a,0x7c8c9d,0xc0b8a6][Math.floor(Math.random()*4)]));b.position.set(x,h/2,z);b.castShadow=true;b.receiveShadow=true;scene.add(b);
+for(let yy=2;yy<h-1;yy+=3)for(let xx=-w/2+2;xx<w/2;xx+=3){let win=new THREE.Mesh(new THREE.BoxGeometry(.8,.9,.05),new THREE.MeshBasicMaterial({color:mode==='night'?0xffd77a:0x9bdcf2}));win.position.set(x+xx,yy,z-d/2-.03);scene.add(win)}
+}
+for(let i=0;i<150;i++){let x=(Math.random()-.5)*520,z=(Math.random()-.5)*540;if(Math.abs(x)<16||Math.abs(z)<16||Math.abs(Math.abs(x)-95)<12||Math.abs(Math.abs(z)-110)<12)continue;let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,2,7),mat(0x705039));trunk.position.set(x,1,z);scene.add(trunk);let crown=new THREE.Mesh(new THREE.SphereGeometry(1.5,8,7),mat(0x267347));crown.position.set(x,2.8,z);crown.scale.y=1.25;scene.add(crown)}
+// car builder: body proportions and visible details
+let carGroup=new THREE.Group(),wheelMeshes=[],wheelRadius=.43;
+function buildCar(){scene.remove(carGroup);carGroup=new THREE.Group();wheelMeshes=[];let c=cars[selected],paint=mat(c.color,.3),dark=mat(0x17212b,.35),glass= new THREE.MeshStandardMaterial({color:0x83c9e6,metalness:.25,roughness:.18});
+function box(w,h,d,m,x,y,z){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;carGroup.add(o);return o}
+box(2.05,.58,4.15,paint,0,.8,0);box(1.72,.65,2.05,paint,0,1.35,-.35);box(1.62,.48,1.75,glass,0,1.42,-.38);
+box(1.88,.13,.1,mat(0xffffff),0,.87,-2.08);box(1.85,.14,.1,mat(0xff382e),0,.87,2.08);
+for(let x of [-1,1])for(let z of [-1.35,1.35]){let wheel=new THREE.Mesh(new THREE.CylinderGeometry(wheelRadius,wheelRadius,.28,18),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(x*1.03,.43,z);wheel.castShadow=true;carGroup.add(wheel);wheelMeshes.push(wheel);let hub=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.3,16),mat(0xbac5cc,.25));hub.rotation.z=Math.PI/2;hub.position.copy(wheel.position);carGroup.add(hub)}
+// mirrors
+for(let x of [-1,1])box(.18,.18,.3,dark,x*1.05,1.25,-.85);
+scene.add(carGroup);carGroup.position.set(0,0,0)}
+buildCar();
+// clouds, sun/moon
+const skyOrb=new THREE.Mesh(new THREE.SphereGeometry(5,20,16),new THREE.MeshBasicMaterial({color:0xffe8a0}));skyOrb.position.set(-90,70,-160);scene.add(skyOrb);
+function hold(id,fnOn,fnOff){let el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);fnOn()});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,fnOff))}
+hold('gas',()=>gas=1,()=>gas=0);hold('brake',()=>brake=1,()=>brake=0);hold('left',()=>steer=-1,()=>{if(steer===-1)steer=0});hold('right',()=>steer=1,()=>{if(steer===1)steer=0});
+$('start').onclick=()=>{setLighting();buildCar();$('menu').style.display='none';started=true;speed=0};
+$('switch').onclick=()=>{if(!started)return;$('menu').style.display='flex';started=false;gas=brake=steer=0;renderCars();$('subtitle').textContent='Choose another car and jump back into free drive.'};
+let last=0;
+function animate(t){requestAnimationFrame(animate);let dt=Math.min((t-last)/1000||.016,.04);last=t;
+if(started){let c=cars[selected];if(gas)speed+=c.acc*dt;if(brake)speed-=22*dt;if(!gas&&!brake)speed-=Math.sign(speed)*Math.min(Math.abs(speed),5*dt);speed=THREE.MathUtils.clamp(speed,-28,c.max);let moving=Math.abs(speed)>.5;heading-=steer*dt*(.9+Math.abs(speed)/100)*(speed<0?-1:1);carGroup.rotation.y=heading;let forward=new THREE.Vector3(Math.sin(heading),0,Math.cos(heading));carGroup.position.addScaledVector(forward,speed*dt); 
+let hit=false;for(const o of obstacles){if(Math.abs(carGroup.position.x-o.x)<o.w/2+1.15&&Math.abs(carGroup.position.z-o.z)<o.d/2+2.05){hit=true;break}}
+if(hit){carGroup.position.addScaledVector(forward,-speed*dt*1.15);speed=-Math.sign(speed)*Math.min(Math.abs(speed)*.18,8);$('status').textContent='COLLISION';}
+wheelMeshes.forEach(w=>w.rotation.x+=speed*dt/3.6/wheelRadius);
+let target=carGroup.position.clone().add(new THREE.Vector3(-Math.sin(heading)*9,5.2,-Math.cos(heading)*9));camera.position.lerp(target,.09);camera.lookAt(carGroup.position.x,carGroup.position.y+1,carGroup.position.z+2*Math.cos(heading));
+$('speed').innerHTML=Math.round(Math.abs(speed))+'<small>KM/H</small>';$('carname').textContent=c.name;$('gear').textContent=speed<-.5?'R':speed<.5?'N':'D';$('status').textContent=moving?'DRIVING':'IDLE';
+}else{camera.position.lerp(new THREE.Vector3(0,36,52),.025);camera.lookAt(0,0,0)}
+renderer.render(scene,camera)}
+camera.position.set(0,36,52);camera.lookAt(0,0,0);setLighting();requestAnimationFrame(animate);
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+})();
+</script></body></html>
