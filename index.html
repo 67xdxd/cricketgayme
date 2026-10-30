@@ -1,128 +1,145 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>OPEN ROAD — Free Drive</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>BOUNDARY PRO — Cricket Championship</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#86b9d8;font-family:system-ui,Arial;color:#fff;touch-action:none}#world{position:fixed;inset:0}canvas{display:block}
-#top{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;gap:8px}.glass{transition:transform .2s,border-color .2s;animation:floatui 4s ease-in-out infinite}.glass:nth-child(2){animation-delay:1s}@keyframes floatui{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}.glass{background:#071321dc;border:1px solid #bdeaff55;border-radius:13px;padding:9px 12px;backdrop-filter:blur(8px);box-shadow:0 4px 18px #0005}.brand{font-weight:1000;letter-spacing:2px;color:#9be9ff}.small{font-size:10px;color:#c5d6e5}.right{text-align:right;font-size:12px;line-height:1.5}
-#speedbox{position:fixed;right:14px;bottom:118px;width:116px;height:116px;border-radius:50%;background:#061321e8;border:3px solid #a8eaff88;display:grid;place-items:center;box-shadow:0 5px 20px #0008;pointer-events:none}#speed{text-align:center;font-size:34px;font-weight:1000;line-height:1;color:#fff}#speed small{display:block;font-size:10px;letter-spacing:2px;color:#9fdfff;margin-top:5px}
-#controls{position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:space-between;align-items:end;padding:0 15px;pointer-events:none;gap:12px}.cluster{display:flex;gap:10px;align-items:end;pointer-events:auto}.pedal{width:72px;height:76px;border-radius:17px;border:1px solid #ffffff88;background:linear-gradient(#263e59ee,#081321ee);color:white;font-weight:1000;font-size:12px;box-shadow:0 5px 12px #0007;touch-action:none}.pedal.gas{background:linear-gradient(#41c98b,#08714d)}.pedal.brake{background:linear-gradient(#fa806e,#9b2929)}.pedal:active{filter:brightness(1.25);transform:translateY(2px)}#steer{display:flex;gap:8px;pointer-events:auto}.steer{width:58px;height:62px;border-radius:15px;border:1px solid #ffffff88;background:#081321df;color:white;font-size:26px;font-weight:900;touch-action:none}
-#menu{position:fixed;inset:0;z-index:5;background:linear-gradient(130deg,#071625ed,#102e43eF);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}#panel{animation:panelin .45s cubic-bezier(.2,.8,.2,1);width:min(560px,100%);background:#081727f5;border:1px solid #8edfff66;border-radius:22px;padding:20px;box-shadow:0 18px 55px #0009}@keyframes panelin{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}h1{margin:0;color:#9be9ff;font-size:clamp(30px,8vw,46px);letter-spacing:3px}#subtitle{color:#c5d9e8;margin:5px 0 16px;font-size:13px}.section{font-size:11px;letter-spacing:2px;color:#8bdfff;font-weight:900;margin:14px 0 8px}.cars{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.car{transition:transform .16s,background .16s,border-color .16s}.car:active{transform:scale(.97)}.car{border:1px solid #52728b;background:#10253a;border-radius:12px;padding:10px;text-align:left;color:white;min-height:65px}.car.selected{border:2px solid #70e4ff;background:#153d56}.car b{display:block;font-size:13px}.car span{font-size:11px;color:#bad1e2}.row{display:flex;gap:8px;flex-wrap:wrap}.mode{background:#152b40;border:1px solid #54718a;color:#fff;border-radius:10px;padding:9px 12px;font-weight:800}.mode.active{border-color:#8beaff;background:#16445b}#start{width:100%;padding:15px;border:0;border-radius:12px;background:linear-gradient(90deg,#20c9e9,#4d78ff);color:white;font-weight:1000;font-size:16px;letter-spacing:2px;margin-top:16px}#note{font-size:10px;color:#9db7c9;margin-top:10px;line-height:1.4}
-#switch{position:fixed;left:50%;transform:translateX(-50%);bottom:103px;border:1px solid #bdeaff77;border-radius:10px;background:#071321dc;color:white;padding:8px 12px;font-size:11px;font-weight:900;pointer-events:auto}
-@media(min-width:800px){.pedal{width:86px;height:84px}.steer{width:68px;height:68px}#speedbox{right:28px;bottom:130px}}
-</style></head>
+:root{--lime:#b8ff42;--glass:rgba(7,15,22,.82);--line:rgba(255,255,255,.16)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#07120d;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+#game{position:fixed;inset:0}canvas{display:block}
+.panel{background:linear-gradient(145deg,rgba(7,18,23,.94),rgba(7,15,22,.78));border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 55px #0008;backdrop-filter:blur(12px)}
+#menu{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:linear-gradient(90deg,#06130dcc,#06130d55),linear-gradient(0deg,#06130dcc,transparent 55%);z-index:5}
+.menuCard{width:min(720px,100%);padding:clamp(18px,4vw,32px);max-height:94vh;overflow:auto}
+.eyebrow{color:var(--lime);font-weight:900;letter-spacing:.22em;font-size:11px}
+h1{font-size:clamp(38px,8vw,76px);line-height:.9;margin:9px 0 12px;letter-spacing:-.06em;font-style:italic}
+.sub{color:#c5d0d0;margin:0 0 22px;font-size:14px}
+.modeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mode{border:1px solid #ffffff25;background:#ffffff0b;border-radius:13px;padding:14px 10px;color:white;text-align:left;cursor:pointer;min-height:104px}
+.mode.active{border-color:var(--lime);background:#b8ff4217;box-shadow:inset 0 0 0 1px #b8ff4233}
+.mode b{display:block;font-size:15px;margin:7px 0 3px}.mode small{color:#aebbbc;font-size:11px}
+label{display:block;color:#b8c5c4;font-size:11px;font-weight:800;letter-spacing:.1em;margin:15px 0 7px}
+select{width:100%;padding:12px;background:#142329;color:#fff;border:1px solid #ffffff30;border-radius:10px;font-size:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#start{width:100%;border:0;border-radius:12px;background:var(--lime);color:#14200a;font-weight:1000;font-size:16px;padding:15px;margin-top:18px;cursor:pointer;letter-spacing:.05em}
+.note{font-size:11px;color:#93a2a1;margin-top:10px;text-align:center}
+#hud{position:fixed;inset:0;pointer-events:none;display:none;z-index:3}
+.topbar{position:absolute;left:12px;right:12px;top:12px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.score{padding:12px 16px;min-width:190px;border-top:3px solid var(--lime)}.score strong{font-size:25px;letter-spacing:-.04em}.score small{display:block;color:#c3d0cf;font-size:11px}
+.status{padding:12px 15px;text-align:right;font-weight:900;font-size:12px;border-top:3px solid #fff}
+#message{position:absolute;top:25%;left:50%;transform:translateX(-50%);font-size:clamp(22px,5vw,42px);font-weight:1000;font-style:italic;text-shadow:0 3px 12px #000;white-space:nowrap;text-align:center}
+#bottom{position:absolute;bottom:max(15px,env(safe-area-inset-bottom));left:0;right:0;display:flex;justify-content:center;align-items:end;gap:12px;padding:0 12px}
+.action{pointer-events:auto;border:1px solid #ffffff45;color:#fff;background:#07141bd9;border-radius:15px;padding:14px 18px;font-weight:1000;min-width:105px;box-shadow:0 8px 24px #0007;touch-action:manipulation}
+.action.hit{background:linear-gradient(135deg,#d7ff75,#a4ed24);color:#12200a;border:0;min-width:138px;font-size:18px;padding:18px;box-shadow:0 7px 26px #9be52b55}
+.action:disabled{opacity:.35}
+#aim{position:absolute;left:50%;bottom:112px;transform:translateX(-50%);color:#fff9;font-size:11px;letter-spacing:.12em;text-align:center}
+#result{position:fixed;inset:0;z-index:8;display:none;align-items:center;justify-content:center;padding:18px;background:#020807bb}
+.resultCard{width:min(440px,100%);padding:25px;text-align:center}.resultCard h2{font-size:36px;margin:6px}.resultCard p{color:#bdc9c7}
+.resultCard button{margin:6px}
+@media(max-width:540px){.modeGrid{grid-template-columns:1fr}.mode{min-height:0;padding:10px 12px}.mode small{display:inline}.menuCard{max-height:96vh}.topbar{top:8px;left:8px;right:8px}.score{min-width:145px;padding:8px 10px}.score strong{font-size:21px}.status{padding:8px;font-size:10px}.action{min-width:80px;padding:12px 10px}.action.hit{min-width:112px}}
+</style>
+</head>
 <body>
-<div id="world"></div>
-<div id="top"><div class="glass"><div class="brand">OPEN ROAD</div><div class="small">FREE DRIVE • NO RACES</div></div><div class="glass right"><span id="carname">Starter Coupe</span><br><span id="gear">D</span> • <span id="status">READY</span></div></div>
-<div id="speedbox"><div id="speed">0<small>KM/H</small></div></div>
-<button id="switch">CHANGE CAR</button>
-<div id="controls"><div class="cluster" id="steer"><button class="steer" id="left">◀</button><button class="steer" id="right">▶</button></div><div class="cluster"><button class="pedal brake" id="brake">BRAKE<br>REV</button><button class="pedal gas" id="gas">ACCEL</button></div></div>
-<div id="menu"><div id="panel"><h1>OPEN ROAD</h1><div id="subtitle">Pick a car. Find your road. Drive at your own pace.</div><div class="section">SELECT YOUR CAR</div><div class="cars" id="cars"></div><div class="section">DRIVE MODE</div><div class="row"><button class="mode active" id="day">☀ DAY</button><button class="mode" id="sunset">🌇 SUNSET</button><button class="mode" id="night">🌙 NIGHT</button></div><button id="start">START FREE DRIVE</button><div id="note">Mobile: ◀ ▶ to steer · ACCEL to drive · BRAKE/REV to slow down or reverse. No timer, no opponents, no racing. Improved 3D free-drive prototype; internet is needed to load the graphics engine.</div></div></div>
+<div id="game"></div>
+<div id="menu">
+ <div class="menuCard panel">
+  <div class="eyebrow">THE CRICKET CHAMPIONSHIP EXPERIENCE</div>
+  <h1>BOUNDARY<br><span style="color:var(--lime)">PRO</span></h1>
+  <p class="sub">Build your innings. Master the timing. Chase the target. Win the championship.</p>
+  <div class="modeGrid">
+   <button class="mode active" data-mode="quick"><span>🏏</span><b>Quick Match</b><small>Classic match • choose overs</small></button>
+   <button class="mode" data-mode="tournament"><span>🏆</span><b>Tournament</b><small>Knockout cup • win to advance</small></button>
+   <button class="mode" data-mode="school"><span>🎒</span><b>School Match</b><small>School ground • short format</small></button>
+  </div>
+  <div class="row2">
+   <div><label>YOUR TEAM</label><select id="team"><option>India</option><option>Australia</option><option>England</option><option>Pakistan</option><option>South Africa</option><option>New Zealand</option></select></div>
+   <div><label>OPPONENT</label><select id="opp"><option>Australia</option><option>India</option><option>England</option><option>Pakistan</option><option>South Africa</option><option>New Zealand</option></select></div>
+  </div>
+  <div class="row2">
+   <div><label>OVERS</label><select id="overs"><option value="2">2 Overs</option><option value="5" selected>5 Overs</option><option value="10">10 Overs</option><option value="20">20 Overs</option></select></div>
+   <div><label>DIFFICULTY</label><select id="difficulty"><option value=".82">Rookie</option><option value="1" selected>Pro</option><option value="1.22">Legend</option></select></div>
+  </div>
+  <button id="start">START MATCH →</button>
+  <div class="note">PRO EDITION • MOBILE CONTROLS • INTERNET REQUIRED FOR 3D GRAPHICS</div>
+ </div>
+</div>
+<div id="hud">
+ <div class="topbar">
+  <div class="score panel"><small id="inningsLabel">1ST INNINGS</small><strong id="score">0/0</strong><small id="oversText">0.0 overs</small></div>
+  <div class="status panel"><div id="teamsText">IND vs AUS</div><div id="targetText">TARGET —</div></div>
+ </div>
+ <div id="message"></div><div id="aim">TIME YOUR SWING • LOFT FOR AERIAL SHOTS</div>
+ <div id="bottom">
+  <button class="action" id="pause">Ⅱ PAUSE</button>
+  <button class="action hit" id="hit">⚡ SWING</button>
+  <button class="action" id="loft">⬆ LOFT</button>
+ </div>
+</div>
+<div id="result"><div class="resultCard panel"><div class="eyebrow">MATCH REPORT</div><h2 id="resultTitle">INNINGS OVER</h2><p id="resultText"></p><button class="action hit" id="again">PLAY AGAIN</button><button class="action" id="home">MAIN MENU</button></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.152.2/three.min.js"></script>
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
-if(!window.THREE){$('subtitle').textContent='3D engine failed to load. Check your internet connection and refresh.';return}
-const cars=[
-{name:'City Hatch',type:'HATCHBACK',max:105,acc:16,color:0xe8e9ed,price:'FREE'},
-{name:'Street Coupe',type:'COUPE',max:155,acc:19,color:0x2585df,price:'FREE'},
-{name:'Sport Sedan',type:'SPORT',max:190,acc:22,color:0xe34c48,price:'FREE'},
-{name:'Rally 4x4',type:'SUV',max:165,acc:17,color:0xe3b43e,price:'FREE'},
-{name:'Super GT',type:'SUPERCAR',max:285,acc:28,color:0x25b987,price:'FREE'},
-{name:'Hypercar X',type:'HYPERCAR',max:350,acc:32,color:0x9d65ed,price:'FREE'}
-];let selected=0,mode='day',started=false,speed=0,steer=0,gas=0,brake=0,heading=0;
-function renderCars(){ $('cars').innerHTML='';cars.forEach((c,i)=>{let b=document.createElement('button');b.className='car'+(i===selected?' selected':'');b.innerHTML=`<b>${c.name}</b><span>${c.type} • ${c.max} km/h • ${c.price}</span>`;b.onclick=()=>{selected=i;renderCars()};$('cars').appendChild(b)})}
-renderCars();
-$('day').onclick=()=>setMode('day');$('sunset').onclick=()=>setMode('sunset');$('night').onclick=()=>setMode('night');
-function setMode(m){mode=m;['day','sunset','night'].forEach(x=>$(x).classList.toggle('active',x===m))}
-const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,500);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;$('world').appendChild(renderer.domElement);
-scene.fog=new THREE.Fog(0x9bcde4,90,260);const hemi=new THREE.HemisphereLight(0xd9efff,0x56634e,2);scene.add(hemi);const sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(-40,80,30);sun.castShadow=true;scene.add(sun);
-function setLighting(){let bg=mode==='night'?0x08152c:mode==='sunset'?0xf0a078:0x9bcde4;scene.background=new THREE.Color(bg);scene.fog.color.setHex(bg);sun.intensity=mode==='night'?.35:mode==='sunset'?1.1:2;hemi.intensity=mode==='night'?.55:1.8}
-const mat=(c,r=.75)=>new THREE.MeshStandardMaterial({color:c,roughness:r});
-const obstacles=[];
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(600,600),mat(0x528454));ground.rotation.x=-Math.PI/2;ground.position.y=-.12;ground.receiveShadow=true;scene.add(ground);
-// Broad road loop, plus side streets
-const roadMat=new THREE.MeshStandardMaterial({color:0x252b32,roughness:.96}),lineMat=mat(0xf4e8ad),white=mat(0xe8edf0),sidewalkMat=mat(0x92999d);
-function road(x,z,w,d){
-  const asphalt=new THREE.Mesh(new THREE.BoxGeometry(w,.12,d),roadMat);asphalt.position.set(x,-.055,z);asphalt.receiveShadow=true;scene.add(asphalt);
-  const vertical=d>=w,long=vertical?d:w,cross=vertical?w:d;
-  for(const side of [-1,1]){
-    const edge=new THREE.Mesh(new THREE.BoxGeometry(vertical?.13:long,.025,vertical?long:.13),white);
-    edge.position.set(x+(vertical?side*(cross/2-1):0),.015,z+(vertical?0:side*(cross/2-1)));scene.add(edge);
-  }
-  for(let k=-Math.floor(long/12);k<=Math.floor(long/12);k++){
-    const dash=new THREE.Mesh(new THREE.BoxGeometry(vertical?.16:4,.025,vertical?4:.16),lineMat);
-    dash.position.set(x+(vertical?0:k*12),.018,z+(vertical?k*12:0));scene.add(dash);
-  }
-  for(const side of [-1,1]){
-    const sw=new THREE.Mesh(new THREE.BoxGeometry(vertical?1.5:long,.22,vertical?long:1.5),sidewalkMat);
-    sw.position.set(x+(vertical?side*(cross/2+0.85):0),.015,z+(vertical?0:side*(cross/2+0.85)));sw.receiveShadow=true;scene.add(sw);
-  }
+let scene,camera,renderer,clock,ground,ball,batGroup,players=[],stumps=[],fielders=[],mode='quick',state='menu',score=0,wickets=0,balls=0,overs=5,target=null,innings=1,team='India',opp='Australia',difficulty=1,delivery=null,shotType='ground',paused=false,runTimer=0,ballVel=new THREE.Vector3(),batAnim=0,matchId=0;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function mat(c,r=.75,metal=0){return new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:metal})}
+function box(w,h,d,m,x,y,z,parent=scene){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function cyl(rt,rb,h,m,x,y,z,parent=scene){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,12),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
+function makePerson(x,z,shirt,scale=1){let g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(scale);scene.add(g);let skin=mat(0xb77c55),cloth=mat(shirt),pants=mat(0x202a35),head=new THREE.Mesh(new THREE.SphereGeometry(.19,14,12),skin);head.position.y=1.65;g.add(head);box(.48,.62,.28,cloth,0,1.15,0,g);for(let s of [-1,1]){cyl(.075,.09,.72,pants,s*.14,.42,0,g);cyl(.055,.07,.58,skin,s*.34,1.17,0,g)}return g}
+function buildWorld(){
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x83b9d0);scene.fog=new THREE.Fog(0x83b9d0,65,190);
+ camera=new THREE.PerspectiveCamera(53,innerWidth/innerHeight,.1,400);camera.position.set(0,7.8,17);camera.lookAt(0,1,0);
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;$('game').innerHTML='';$('game').appendChild(renderer.domElement);
+ scene.add(new THREE.HemisphereLight(0xeaf7ff,0x294a28,2.25));let sun=new THREE.DirectionalLight(0xfff4df,2.8);sun.position.set(-25,38,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+ const grass=mat(0x267b3a,1),stripe=mat(0x328b40,1),soil=mat(0xb98b58,1),pitchmat=mat(0xc7a477,1),white=mat(0xf3f2df);
+ box(150,.25,150,grass,0,-.15,0);for(let i=-7;i<=7;i++){box(150,.012,5,stripe,0,.0,i*9)}
+ // oval boundary rope
+ let ring=new THREE.Mesh(new THREE.TorusGeometry(48,.12,8,120),white);ring.rotation.x=Math.PI/2;ring.position.y=.1;ring.scale.z=.84;scene.add(ring);
+ // stands, seats, floodlights
+ for(let side of [-1,1]){let stand=box(23,5,4,mat(0x66727a),side*53,2.3,0);stand.rotation.y=side*.12;for(let row=0;row<3;row++)box(22,.18,3.5,mat(row%2?0x1b4b77:0x9a2934),side*53,1+row*1.1,0)}
+ for(let x of [-62,62])for(let z of [-45,45]){cyl(.18,.28,18,mat(0x56616b),x,9,z);box(2,.22,.5,mat(0xffffff),x,18,z)}
+ // pitch, creases and wickets
+ box(3.4,.12,20,soil,0,.02,0);box(2.8,.08,18,pitchmat,0,.1,0);
+ for(let z of [-8,8]){box(3.5,.04,.12,white,0,.18,z);for(let x of [-1.15,0,1.15])cyl(.045,.045,1.05,mat(0xf1e6c8),x,.7,z)}
+ // batsman at near end
+ makePerson(0,11,0x244e9b,1.05);makePerson(0,-11,0xc42f32,1.02);
+ // umpire
+ makePerson(3.4,-9,0xf2f0e9,.95);
+ // fielders around oval
+ fielders=[];for(let i=0;i<9;i++){let a=i/9*Math.PI*2;fielders.push(makePerson(Math.sin(a)*31,Math.cos(a)*25,0x244e9b,.92))}
+ // crowd dots as simple coloured seats
+ for(let i=0;i<240;i++){let a=Math.random()*Math.PI*2,r=52+Math.random()*5,x=Math.sin(a)*r,z=Math.cos(a)*r*.84;let dot=new THREE.Mesh(new THREE.SphereGeometry(.22,6,6),mat([0xe8e8e8,0x263d66,0xb33136,0xf0c94d][i%4]));dot.position.set(x,1+Math.random()*2,z);scene.add(dot)}
+ // bat model
+ batGroup=new THREE.Group();batGroup.position.set(-.65,1.05,10.2);batGroup.rotation.z=-.15;scene.add(batGroup);
+ let wood=mat(0xc28a45,.6),grip=mat(0x292b35);box(.18,.95,.09,wood,0,0,0,batGroup);box(.13,.34,.1,grip,0,.62,0,batGroup);
+ ball=new THREE.Mesh(new THREE.SphereGeometry(.16,20,16),new THREE.MeshStandardMaterial({color:0xc91e2b,roughness:.32}));ball.position.set(0,1,-8);scene.add(ball);
+ // simple boundary boards
+ for(let i=0;i<40;i++){let a=i/40*Math.PI*2,x=Math.sin(a)*49,z=Math.cos(a)*41;let b=box(2,.7,.35,mat(i%2?0x194b79:0xb42d37),x,.4,z);b.lookAt(0,.4,0)}
 }
-road(0,0,18,360);road(0,-110,210,16);road(0,110,210,16);road(-95,0,16,220);road(95,0,16,220);road(0,0,210,16);
-// City blocks, trees and streetlights
-for(let x=-250;x<=250;x+=30)for(let z=-270;z<=270;z+=32){if(Math.abs(x)<19||Math.abs(z)<19||Math.abs(Math.abs(x)-95)<12||Math.abs(Math.abs(z)-110)<12)continue;
-let h=7+Math.random()*30,w=11+Math.random()*10,d=11+Math.random()*10;obstacles.push({x,z,w,d});let b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat([0x8799a8,0xb0a59a,0x7c8c9d,0xc0b8a6][Math.floor(Math.random()*4)]));b.position.set(x,h/2,z);b.castShadow=true;b.receiveShadow=true;scene.add(b);
-for(let yy=2;yy<h-1;yy+=3)for(let xx=-w/2+2;xx<w/2;xx+=3){let win=new THREE.Mesh(new THREE.BoxGeometry(.8,.9,.05),new THREE.MeshBasicMaterial({color:mode==='night'?0xffd77a:0x9bdcf2}));win.position.set(x+xx,yy,z-d/2-.03);scene.add(win)}
+function updateScore(){ $('score').textContent=score+'/'+wickets;$('oversText').textContent=Math.floor(balls/6)+'.'+balls%6+' overs';$('targetText').textContent=target?'TARGET '+target:'OVERS '+overs;$('teamsText').textContent=(innings===1?team:opp).toUpperCase()+'  •  '+(innings===1?opp:team).toUpperCase();$('inningsLabel').textContent=innings===1?'1ST INNINGS':'2ND INNINGS'}
+function msg(t){$('message').textContent=t}
+function resetGame(){matchId++;score=0;wickets=0;balls=0;innings=1;target=null;paused=false;state='playing';delivery=null;buildWorld();updateScore();$('menu').style.display='none';$('result').style.display='none';$('hud').style.display='block';$('pause').textContent='Ⅱ PAUSE';msg('GET READY');setTimeout(()=>{if(state==='playing')nextBall()},900)}
+function nextBall(){if(state!=='playing'||paused||delivery)return;if(balls>=overs*6||wickets>=10){endInnings();return}
+ state='delivery';let speed=(.075+Math.random()*.035)*difficulty;let line=(Math.random()-.5)*1.25;let bounceZ=-1.8-Math.random()*1.2;delivery={t:0,duration:1.55/difficulty,line,bounceZ,speed,hit:false,loft:false};ball.position.set(line,2.1,-8);msg('BOWLER RUNS IN…');setTimeout(()=>{if(delivery&&state==='delivery')msg('WATCH THE BALL!')},450)}
+function swing(loft=false){if(state!=='delivery'||!delivery||delivery.hit||paused)return;delivery.hit=true;delivery.loft=loft;batAnim=1;let timing=delivery.t/delivery.duration;let quality=1-Math.abs(timing-.78)*2.9;quality=clamp(quality,0,1);let contact=Math.abs(delivery.line)<1.25;let chance=quality*(contact?1:.55);
+ if(chance<.18){msg('BEATEN!');setTimeout(()=>{if(delivery){delivery=null;balls++;updateScore();if(balls>=overs*6||wickets>=10)endInnings();else setTimeout(nextBall,650)}},450);return}
+ let runs;if(quality>.88)runs=loft?(Math.random()<.72?6:4):(Math.random()<.55?4:2);else if(quality>.62)runs=Math.random()<.48?4:2;else runs=Math.random()<.5?1:0;
+ if(!contact&&runs>2)runs=1;
+ if(loft&&quality>.55&&Math.random()<.16){runs=0;setTimeout(()=>{if(state==='playing'){wickets++;msg('CAUGHT!');finishBall(0,true)}},850);return}
+ msg(quality>.88?(runs===6?'SIX!':'PERFECT TIMING!'):quality>.55?'GOOD SHOT':'EDGED!');
+ let angle=(Math.random()-.5)*1.4;let dist=runs===6?62:runs===4?50:runs===2?29:14;let targetX=Math.sin(angle)*dist,targetZ=-Math.cos(angle)*dist;
+ let start=ball.position.clone(),elapsed=0;let anim=()=>{if(state!=='playing')return;elapsed+=.035;let q=clamp(elapsed,0,1);ball.position.set(start.x+(targetX-start.x)*q,Math.max(.2,1+Math.sin(q*Math.PI)*(loft?13:4)),start.z+(targetZ-start.z)*q);if(q<1)requestAnimationFrame(anim);else{score+=runs;finishBall(runs,false)}};requestAnimationFrame(anim)
 }
-for(let i=0;i<150;i++){let x=(Math.random()-.5)*520,z=(Math.random()-.5)*540;if(Math.abs(x)<16||Math.abs(z)<16||Math.abs(Math.abs(x)-95)<12||Math.abs(Math.abs(z)-110)<12)continue;let trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,2,7),mat(0x705039));trunk.position.set(x,1,z);scene.add(trunk);let crown=new THREE.Mesh(new THREE.SphereGeometry(1.5,8,7),mat(0x267347));crown.position.set(x,2.8,z);crown.scale.y=1.25;scene.add(crown)}
-// street lamps along the main avenues
-const lampMat=mat(0x303a43),bulbMat=new THREE.MeshBasicMaterial({color:0xffefc2});
-for(let z=-165;z<=165;z+=30)for(const x of [-12,12]){
-  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.09,.13,6,8),lampMat);pole.position.set(x,3,z);scene.add(pole);
-  const arm=new THREE.Mesh(new THREE.BoxGeometry(.9,.09,.09),lampMat);arm.position.set(x+(x<0?.38:-.38),5.85,z);scene.add(arm);
-  const bulb=new THREE.Mesh(new THREE.SphereGeometry(.18,8,8),bulbMat);bulb.position.set(x+(x<0?.78:-.78),5.72,z);scene.add(bulb);
-}
-// simple roadside parking bays and crosswalks at the central junction
-for(let i=-4;i<=4;i++){
-  const stripe=new THREE.Mesh(new THREE.BoxGeometry(.7,.025,5),white);stripe.position.set(i*1.25,.025,-9);scene.add(stripe);
-  const stripe2=stripe.clone();stripe2.position.z=9;scene.add(stripe2);
-}
-// car builder: body proportions and visible details
-let carGroup=new THREE.Group(),wheelMeshes=[],wheelRadius=.43;
-function buildCar(){scene.remove(carGroup);carGroup=new THREE.Group();wheelMeshes=[];let c=cars[selected],paint=mat(c.color,.3),dark=mat(0x17212b,.35),glass= new THREE.MeshStandardMaterial({color:0x83c9e6,metalness:.25,roughness:.18});
-function box(w,h,d,m,x,y,z){let o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;carGroup.add(o);return o}
-box(2.05,.58,4.15,paint,0,.8,0);box(1.72,.65,2.05,paint,0,1.35,-.35);box(1.62,.48,1.75,glass,0,1.42,-.38);
-box(1.88,.13,.1,mat(0xffffff),0,.87,-2.08);box(1.85,.14,.1,mat(0xff382e),0,.87,2.08);
-for(let x of [-1,1])for(let z of [-1.35,1.35]){let wheel=new THREE.Mesh(new THREE.CylinderGeometry(wheelRadius,wheelRadius,.28,18),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(x*1.03,.43,z);wheel.castShadow=true;carGroup.add(wheel);wheelMeshes.push(wheel);let hub=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.3,16),mat(0xbac5cc,.25));hub.rotation.z=Math.PI/2;hub.position.copy(wheel.position);carGroup.add(hub)}
-// mirrors, bumpers, grille, lights, window pillars and sporty details
-for(let x of [-1,1])box(.2,.16,.32,dark,x*1.08,1.25,-.86);
-box(1.72,.16,.16,dark,0,.58,-2.12); // front grille
-box(1.82,.12,.16,dark,0,.55,2.12); // rear diffuser
-for(let x of [-.72,.72]){
-  box(.42,.13,.12,mat(0xfff3cf,.25),x,.91,-2.13); // headlights
-  box(.38,.13,.12,mat(0xff2525,.25),x,.91,2.13); // tail lamps
-  // visible side windows
-  box(.045,.43,1.28,dark,x*1.01,1.48,-.42);
-  // wheel arch trim
-  const arch=new THREE.Mesh(new THREE.TorusGeometry(.49,.065,8,24),dark);arch.rotation.y=Math.PI/2;arch.position.set(x*1.02,.48,-1.35);carGroup.add(arch);
-  const arch2=arch.clone();arch2.position.z=1.35;carGroup.add(arch2);
-}
-// hood crease lines and roof spoiler
-for(let x of [-.62,.62])box(.035,.018,1.15,mat(0xffffff,.45),x,1.105,-1.35);
-box(1.55,.08,.22,dark,0,1.78,.78);
-scene.add(carGroup);carGroup.position.set(0,0,0)}
-buildCar();
-// clouds, sun/moon
-const skyOrb=new THREE.Mesh(new THREE.SphereGeometry(5,20,16),new THREE.MeshBasicMaterial({color:0xffe8a0}));skyOrb.position.set(-90,70,-160);scene.add(skyOrb);
-function hold(id,fnOn,fnOff){let el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);fnOn()});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>el.addEventListener(ev,fnOff))}
-hold('gas',()=>gas=1,()=>gas=0);hold('brake',()=>brake=1,()=>brake=0);hold('left',()=>steer=-1,()=>{if(steer===-1)steer=0});hold('right',()=>steer=1,()=>{if(steer===1)steer=0});
-$('start').onclick=()=>{setLighting();buildCar();$('menu').style.display='none';started=true;speed=0};
-$('switch').onclick=()=>{if(!started)return;$('menu').style.display='flex';started=false;gas=brake=steer=0;renderCars();$('subtitle').textContent='Choose another car and jump back into free drive.'};
-let last=0;
-function animate(t){requestAnimationFrame(animate);let dt=Math.min((t-last)/1000||.016,.04);last=t;
-if(started){let c=cars[selected];if(gas)speed+=c.acc*dt;if(brake)speed-=22*dt;if(!gas&&!brake)speed-=Math.sign(speed)*Math.min(Math.abs(speed),5*dt);speed=THREE.MathUtils.clamp(speed,-28,c.max);let moving=Math.abs(speed)>.5;heading-=steer*dt*(.9+Math.abs(speed)/100)*(speed<0?-1:1);carGroup.rotation.y=heading;let forward=new THREE.Vector3(Math.sin(heading),0,Math.cos(heading));carGroup.position.addScaledVector(forward,speed*dt); 
-let hit=false;for(const o of obstacles){if(Math.abs(carGroup.position.x-o.x)<o.w/2+1.15&&Math.abs(carGroup.position.z-o.z)<o.d/2+2.05){hit=true;break}}
-if(hit){carGroup.position.addScaledVector(forward,-speed*dt*1.15);speed=-Math.sign(speed)*Math.min(Math.abs(speed)*.18,8);$('status').textContent='COLLISION';}
-wheelMeshes.forEach(w=>w.rotation.x+=speed*dt/3.6/wheelRadius);
-let target=carGroup.position.clone().add(new THREE.Vector3(-Math.sin(heading)*9,5.2,-Math.cos(heading)*9));camera.position.lerp(target,.09);camera.lookAt(carGroup.position.x,carGroup.position.y+1,carGroup.position.z+2*Math.cos(heading));
-$('speed').innerHTML=Math.round(Math.abs(speed))+'<small>KM/H</small>';$('carname').textContent=c.name;$('gear').textContent=speed<-.5?'R':speed<.5?'N':'D';$('status').textContent=moving?'DRIVING':'IDLE';
-}else{camera.position.lerp(new THREE.Vector3(0,36,52),.025);camera.lookAt(0,0,0)}
-renderer.render(scene,camera)}
-camera.position.set(0,36,52);camera.lookAt(0,0,0);setLighting();requestAnimationFrame(animate);
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+function finishBall(runs,isWicket){if(!delivery)return;delivery=null;balls++;updateScore();if(target&&score>=target){endMatch(true);return}if(balls>=overs*6||wickets>=10){endInnings();return}setTimeout(()=>{if(state==='playing'&&!paused){msg(runs===0?'DOT BALL':'NEXT BALL');setTimeout(nextBall,650)}},500)}
+function endInnings(){if(innings===1){target=score+1;innings=2;score=0;wickets=0;balls=0;updateScore();msg('INNINGS BREAK');setTimeout(()=>{if(state==='playing'){state='playing';nextBall()}},1400)}else endMatch(score>=target)}
+function endMatch(won){state='result';$('resultTitle').textContent=won?'YOU WIN!':'MATCH OVER';$('resultText').textContent=won?'Brilliant chase! You reached the target.':'Good game! The opposition held on this time.';$('result').style.display='flex'}
+function animate(){requestAnimationFrame(animate);if(!renderer)return;let dt=Math.min(clock.getDelta(),.04);if(state==='delivery'&&delivery&&!paused){delivery.t+=dt;let q=clamp(delivery.t/delivery.duration,0,1);let z=-8+q*17;let y=q<.58?2.1-(q/.58)*1.25:.85+Math.sin((q-.58)/.42*Math.PI)*.62;ball.position.set(delivery.line*(.4+q*.6),y,z);if(q>=1&&!delivery.hit){delivery=null;balls++;updateScore();msg('DOT BALL');if(balls>=overs*6||wickets>=10)endInnings();else setTimeout(nextBall,850)}}if(batAnim>0){batAnim=Math.max(0,batAnim-dt*3.8);batGroup.rotation.x=-Math.sin((1-batAnim)*Math.PI)*1.2;batGroup.rotation.z=-.15-Math.sin((1-batAnim)*Math.PI)*.9}else{batGroup.rotation.x=0;batGroup.rotation.z=-.15}renderer.render(scene,camera)}
+$('hit').addEventListener('pointerdown',e=>{e.preventDefault();swing(false)});$('loft').addEventListener('pointerdown',e=>{e.preventDefault();swing(true)});
+$('pause').onclick=()=>{if(state!=='playing'&&state!=='delivery')return;paused=!paused;$('pause').textContent=paused?'▶ RESUME':'Ⅱ PAUSE';if(paused)msg('PAUSED');else{msg('PLAY ON');if(!delivery&&balls<overs*6)setTimeout(nextBall,400)}};
+$('again').onclick=()=>{resetGame()};$('home').onclick=()=>{state='menu';$('result').style.display='none';$('hud').style.display='none';$('menu').style.display='flex'};
+document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;if(mode==='school'){$('overs').value='2';$('difficulty').value='.82'}else if(mode==='tournament'){$('overs').value='5';$('difficulty').value='1'}});
+$('start').onclick=()=>{team=$('team').value;opp=$('opp').value;if(team===opp){alert('Choose two different teams!');return}overs=mode==='school'?2:Number($('overs').value);difficulty=Number($('difficulty').value);if(mode==='tournament')overs=5;resetGame()};
+window.addEventListener('resize',()=>{if(camera&&renderer){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}});
+clock=new THREE.Clock();animate();
 })();
-</script></body></html>
+</script>
+</body></html>
